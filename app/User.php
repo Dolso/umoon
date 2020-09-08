@@ -36,4 +36,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    //user can have several bots
+    public function bots()
+    {
+        return $this->hasMany('App\Bot');
+    }
 }

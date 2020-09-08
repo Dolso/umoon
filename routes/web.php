@@ -20,3 +20,9 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::post('/dev/{hash}', 'DevController@index');
+
+Route::group(['middleware' => 'auth'], function() {
+    Route::resource('/bots', 'BotController');
+});

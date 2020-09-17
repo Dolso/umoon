@@ -84,9 +84,9 @@ class BotController extends Controller
         }
 
         if (!empty($triggers_arr)) {
-            $triggers_json = json_encode($triggers_arr, JSON_PRETTY_PRINT);
+            $triggers_json = json_encode($triggers_arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            $triggers_json = json_encode(['trigger' => 'response'], JSON_PRETTY_PRINT);
+            $triggers_json = json_encode(['trigger' => 'response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
 
         return view('bot.show', compact('bot', 'triggers_json')); 
@@ -121,7 +121,14 @@ class BotController extends Controller
         }
         
     }
-
+    
+    /**
+     * Update bot status.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Bot  $bot
+     * @return \Illuminate\Http\Response
+     */
     private function updateSwitchStatus(Request $request, Bot $bot) 
     {
 
@@ -135,6 +142,13 @@ class BotController extends Controller
         return response(null);
     }
 
+    /**
+     * Update bot triggers.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Bot  $bot
+     * @return \Illuminate\Http\Response
+     */
     private function updateTriggers(Request $request, Bot $bot) 
     {
         $bot->triggers->isEmpty() ? true : $bot->triggers()->delete();

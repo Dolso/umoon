@@ -12,17 +12,16 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Auth::routes(['verify' => true]);
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Auth::routes();
+Route::view('/', 'welcome');
 
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::post('/dev/{hash}', 'DevController@index');
 
-Route::group(['middleware' => 'auth'], function() {
+Route::group(['middleware' => ['auth','verified']], function() {
     Route::resource('/bots', 'BotController');
 });
+
+Route::get('/home', 'HomeController@index')->name('home');

@@ -1,79 +1,47 @@
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
+Umoon
+=====================
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+### Что делает данное приложени и как его использовать
 
-## About Laravel
+Приложение Umoon позволяет пользователям создавать своего бота для групп **vk.com**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Каждый пользователь может создать несколько ботов для нескольких сообществ. В данной версии бот реагирует только
+на сообщение в сообществе.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+#### Создание бота
+Создать бота очень просто, после аутентификации вы можете перейдя на url https://{{your_site}}/bots создать бота,
+нажав на кнопку "Создать бота" и введя:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* Название бота
+* Описание
+* Token
+* Confirmation Token
 
-## Learning Laravel
+Token пока не нужен для данного проекта, но может понадобится в будущем для взаимодействия нашего приложения с api **vk.com**.
+Его вы можете получить в меню "Работа с API" во вкладке "Ключи доступа".
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Confirmation Token обязательно нужен для подтверждения нашего серврера приложения для взаимодействия с сообщениями группы **vk.com**.
+Его вы можете получить в меню "Работа с API" во вкладке "Callback API" и подвкладке "Настройка сервера" после текста "Строка, которую должен вернуть сервер:".
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Далее перейдя в приложении на вашего бота, вы должны скопировать **Код** и вставить его в url: https://{{your_site}}/dev/{{your_code}}.
+Получившейся url вы должны вставить в поле **Адрес** в "Настройка сервера" сообщества.
 
-## Laravel Sponsors
+После всего этого настройка вашего нового бота будет готова.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+#### Настройка логики бота
+На данный момент приложение позволяет вам сделать только примитивную логику.
+Перейдя в приложении на бота, в поле **Тригеры** вы должны прописать/вставить валидный Json.
+В Json ключом для приложения будет являться сктрока, на которую должна реагировать наша разработка, а значением - ответ.
+Т.е. человек написал нашему боту сообщение. Если в json есть такой ключ, равный сообщению, то бот отдает ответ равную значению ключа.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
-- [Appoly](https://www.appoly.co.uk)
-- [OP.GG](https://op.gg)
-- [云软科技](http://www.yunruan.ltd/)
+### Обработка хуков от vk.com
+Данная разработка может обрабатывать хуки, но также для теста я написал на golang отдельный сервис, который будет обрабатывать хуки.
+Для простого теста я просто с помощью nginx проксировал хуки **vk.com** на сервер golang. В среднем он работает намного лучше чем Laravel, хотя его 
+код не совсем хорошо, т.к. у меня вообще не было опыта на golang.
+Ссылка на репозиторий: https://github.com/Dolso/umoon.goHandler
 
-## Contributing
+### Контакты
+Буду рад, если вы напишите мне :)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Почта: omnogom24@yandex.ru  
+Telegram: https://t.me/Dolso  

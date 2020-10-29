@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Bot;
-
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Collection;
+use App\Jobs\AfterResponseMessageAddHisoryJob;
 
 class DevController extends Controller
 {
@@ -14,45 +13,78 @@ class DevController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $hash)
+    public function index (Request $request, $hash)
     {
-
-        $bot = Bot::firstWhere('hash', $hash);
-
-        if (empty($bot)) {
-            return response('ok');
-        }
-
-        if ($bot->is_active == 0) {
-            return response('ok');
-        }
-
         $data = $request->input();
 
+        $response = $this->sendMessageOrReturnConfirmationToken($data, $hash);
+
+        return response($response);
+    }
+
+    /**
+     * Формируем сообщение или отправляем токен.
+     * 
+     * @param array $data - данные, которые были в теле запроса
+     * @param string $hash - хеш бота
+     * @return string возвращает ответ
+     */
+    private function sendMessageOrReturnConfirmationToken ($data, $hash) : string
+    {
         if ($data['type'] == 'confirmation') {
-            return response($bot->confirmation_token);
+
+            $bot = DB::select('
+                SELECT 
+                    confirmation_token
+                FROM 
+                    bots
+                WHERE 
+                    hash = ?
+                LIMIT 1', 
+            [$hash]);
+
+            if (!empty($bot[0]->confirmation_token)) {
+                return response($bot[0]->confirmation_token);
+            }
+            
         } else if ($data['type'] == 'message_new') {
-            $peer_id = $data['object']['peer_id'];
-            $message = $data['object']['text'];
+            $resonse = DB::select('
+                SELECT
+                    bots.id,
+                    bots.token,
+                    triggers.response
+                FROM 
+                    bots 
+                LEFT JOIN 
+                    triggers ON bots.id = triggers.bot_id
+                WHERE 
+                    bots.hash = ? AND 
+                    triggers.trigger_name = ? AND 
+                    bots.is_active = ?
+                LIMIT 1', 
+            [$hash, $data['object']['text'], true]);
 
-            $trigger_response = $bot->triggers()->where('trigger_name', $message)->value('response');
+            if (!empty($resonse)) {
+                $request_params = array(
+                    'message' => $resonse[0]->response,
+                    'peer_id' => $data['object']['peer_id'],
+                    'access_token' => $resonse[0]->token,
+                    'v' => '5.87'
+                );
 
-            empty($trigger_response) ? $message_response = 'Напишите что-нибудь другое' : $message_response = $trigger_response;
+                $get_params = http_build_query($request_params);
+                file_get_contents('https://api.vk.com/method/messages.send?' . $get_params);
 
-            $request_params = array(
-                'message' => $message_response,
-                'peer_id' => $peer_id,
-                'access_token' => $bot->token,
-                'v' => '5.87'
-            );
-
-            $get_params = http_build_query($request_params);
-            file_get_contents('https://api.vk.com/method/messages.send?' . $get_params);
-
-            //$bot->increment('number_response');
+                $job = new AfterResponseMessageAddHisoryJob(
+                    $resonse[0]->id,
+                    $data['object']['text'], 
+                    $data['object']['peer_id']
+                );
+                $this->dispatch($job);
+            }
         }
 
-        return response('ok');
+        return "ok";
     }
 }
 

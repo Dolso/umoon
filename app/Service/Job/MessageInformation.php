@@ -4,7 +4,7 @@ namespace App\Service\Job;
 
 class MessageInformation {
 
-    public function getFullUserName ($peer_id, $token) : string
+    public function getFullUserName (int $peer_id, string $token) : string
     {
         $json_full_name = file_get_contents("https://api.vk.com/method/users.get?user_ids={$peer_id}&v=5.87&access_token={$token}");
 

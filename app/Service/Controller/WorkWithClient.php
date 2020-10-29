@@ -31,14 +31,13 @@ class WorkWithClient {
             $resonse = $this->getMessageReply($key_bot, $data['object']['text'], true);
 
             if (!empty($resonse !== null)) {
-                $request_params = sendMessage($resonse);
+                $this->sendMessage($resonse, $data['object']['peer_id']);
 
-                $job = new AfterResponseMessageAddHisoryJob(
+                AfterResponseMessageAddHisoryJob::dispatch(
                     $resonse[0]->id,
                     $data['object']['text'], 
                     $data['object']['peer_id']
                 );
-                $this->dispatch($job);
             }
         }
 
@@ -51,7 +50,7 @@ class WorkWithClient {
      * @param string $key_bot - ключ бота
      * @return string возвращает токен
      */
-    private function getConfirmationToken (string $key_bot) : string
+    private function getConfirmationToken (string $key_bot) : ?string
     {
         $bot = DB::select('
             SELECT 
@@ -78,7 +77,7 @@ class WorkWithClient {
      * @param string $is_active - активность бота
      * @return string возвращает токен бота
      */
-    private function getMessageReply (string $key_bot, string $text, boolean $is_active) : array
+    private function getMessageReply (string $key_bot, string $text, bool $is_active) : ?array
     {
         $resonse = DB::select('
             SELECT
@@ -96,7 +95,7 @@ class WorkWithClient {
             LIMIT 1', 
         [$key_bot, $text, $is_active]);
 
-        if (empty($resonse)) {
+        if (!empty($resonse)) {
             return $resonse;
         } else {
             return null;
@@ -108,11 +107,11 @@ class WorkWithClient {
      * 
      * @param array $key_bot - ключ бота
      */
-    private function sendMessage (array $resonse) : void
+    private function sendMessage (array $resonse, int $peer_id) : void
     {
         $request_params = array(
             'message' => $resonse[0]->response,
-            'peer_id' => $data['object']['peer_id'],
+            'peer_id' => $peer_id,
             'access_token' => $resonse[0]->token,
             'v' => '5.87'
         );

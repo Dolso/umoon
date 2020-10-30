@@ -6,6 +6,7 @@
             <div class="col-sm-10">
                 <div class="container mt-3">
                     <a href="{{ route('bots.index') }}"><h4>Список ботов</h4></a>
+                    <a href="{{ route('bots.edit', $bot) }}"><h4>Изменить параметры бота</h4></a>
 
                     <h1>{{$bot->name}}</h1>
 

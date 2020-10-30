@@ -3,7 +3,6 @@
 namespace App\Service\Controller;
 
 use Illuminate\Support\Facades\DB;
-use App\Jobs\AfterResponseMessageAddHisoryJob;
 
 class WorkWithClient {
 
@@ -21,11 +20,9 @@ class WorkWithClient {
 
             $confirmation_token = $this->returnConfirmationToken($key_bot);
 
-            if ($confirmation_token === null) {
-                return false;
+            if ($confirmation_token !== null) {
+                return $confirmation_token;
             }
-
-            return 'ok';
             
         } else if ($data['type'] == 'message_new') {
             $resonse = $this->getMessageReply($key_bot, $data['object']['text'], true);
@@ -74,7 +71,7 @@ class WorkWithClient {
      * 
      * @param string $key_bot - ключ бота
      * @param string $text - сообщение
-     * @param string $is_active - активность бота
+     * @param bool $is_active - активность бота
      * @return string возвращает токен бота
      */
     private function getMessageReply (string $key_bot, string $text, bool $is_active) : ?array
@@ -106,6 +103,7 @@ class WorkWithClient {
      * Отправляет сообщение
      * 
      * @param array $key_bot - ключ бота
+     * @param int $peer_id - id клиента
      */
     private function sendMessage (array $resonse, int $peer_id) : void
     {

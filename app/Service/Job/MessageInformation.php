@@ -11,7 +11,9 @@ class MessageInformation {
         if (!empty($json_full_name)) {
             $first_name_and_lastname = json_decode($json_full_name, true);
             
-            if (isset($first_name_and_lastname["response"][0]["last_name"]) and !empty($first_name_and_lastname["response"][0]["last_name"])) {
+            if (isset($first_name_and_lastname["response"][0]["last_name"]) and 
+                isset($first_name_and_lastname["response"][0]["first_name"])) {
+                
                 $name = $first_name_and_lastname["response"][0]["last_name"]. " " .$first_name_and_lastname["response"][0]["first_name"];
 
                 return $name;

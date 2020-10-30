@@ -119,6 +119,18 @@ class BotController extends Controller
         if ($request->has('triggers')) {
             $this->updateTriggers($request, $bot);
         }
+
+        $data = $this->validate($request, [
+            'token' => 'required|min:1',
+            'confirmation_token' => 'required|min:1',
+            'name' => 'required|min:1',
+            'description' => 'required|min:1'
+        ]);
+
+        $bot->fill($data);
+        $bot->save();
+
+        return redirect()->route('bots.index');
         
     }
     

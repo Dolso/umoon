@@ -114,23 +114,19 @@ class BotController extends Controller
     {
         if ($request->has('switch')) {
             $this->updateSwitchStatus($request, $bot);
+        } else {
+            $data = $this->validate($request, [
+                'token' => 'required|min:1',
+                'confirmation_token' => 'required|min:1',
+                'name' => 'required|min:1',
+                'description' => 'required|min:1'
+            ]);
+
+            $bot->fill($data);
+            $bot->save();
+
+            return redirect()->route('bots.index');
         }
-
-        if ($request->has('triggers')) {
-            $this->updateTriggers($request, $bot);
-        }
-
-        $data = $this->validate($request, [
-            'token' => 'required|min:1',
-            'confirmation_token' => 'required|min:1',
-            'name' => 'required|min:1',
-            'description' => 'required|min:1'
-        ]);
-
-        $bot->fill($data);
-        $bot->save();
-
-        return redirect()->route('bots.index');
         
     }
     
@@ -155,29 +151,6 @@ class BotController extends Controller
     }
 
     /**
-     * Update bot triggers.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Bot  $bot
-     * @return \Illuminate\Http\Response
-     */
-    private function updateTriggers(Request $request, Bot $bot) 
-    {
-        $bot->triggers->isEmpty() ? true : $bot->triggers()->delete();
-
-        if($this->is_JSON($new_triggers = (string)$request->input('triggers'))) {
-            $new_triggers_arr = json_decode($new_triggers, true);
-            $triggers_save = [];
-            foreach ($new_triggers_arr as $trigger => $response) {
-                $triggers_save[] = new Trigger(['trigger_name' => (string)$trigger, 'response' => (string)$response]);
-            }
-            $bot->triggers()->saveMany($triggers_save);
-        }
-        
-        return response(null);
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Bot  $bot
@@ -186,11 +159,5 @@ class BotController extends Controller
     public function destroy(Bot $bot)
     {
         //
-    }
-
-    private function is_JSON($args) 
-    {
-        json_decode($args);
-        return (json_last_error()===JSON_ERROR_NONE);
     }
 }

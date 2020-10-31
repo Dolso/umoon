@@ -114,7 +114,7 @@ window.onload = function () {
         console.log('Обновление тригеров');
         if (IsJsonString(textarea)) {
             $.ajax({
-                url: "{{ route('bots.update', $bot) }}",
+                url: "{{ route('triggers.update', $bot) }}",
                 type: 'PATCH',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')    

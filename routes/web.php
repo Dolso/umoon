@@ -18,6 +18,8 @@ Route::view('/', 'welcome');
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::patch('/bots/{bot}/triggers', 'TriggerController@update')->name('triggers.update');
+
 Route::post('/dev/{hash}', 'DevController@index');
 
 Route::group(['middleware' => ['auth','verified']], function() {
